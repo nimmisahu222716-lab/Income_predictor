@@ -95,7 +95,7 @@ $$y = \begin{cases} 0, & \text{if annual income} \le \$50,000 \quad (\text{Stand
 > Handles resilient dataset acquisition across local caching, OpenML, and UCI repositories while eliminating missing tokens (`?`) and unformatted string artifacts. It maps fine-grained demographic subcategories into standardized canonical levels and filters the schema down strictly to the 6 specified attributes plus binary target.
 
 ### Section 3: Preprocessing Architecture & Stratified Split (80:20)
-> Partitions the sample into training ($80\%$) and testing ($20\%$) subsets using stratified sampling to preserve the empirical class ratio ($P(y=1) \approx 0.249$). Encapsulates preprocessing transformations so that statistical parameters (mean, standard deviation, and categorical bin boundaries) are computed strictly on the training partition, guaranteeing zero data leakage.
+> Partitions the sample into training (80%) and testing (20%) subsets using stratified sampling to preserve the empirical class ratio ($P(y=1) \approx 0.249$). Encapsulates preprocessing transformations so that statistical parameters (mean, standard deviation, and categorical bin boundaries) are computed strictly on the training partition, guaranteeing zero data leakage.
 
 ### Section 4: CART Algorithm Implementation (Gini Impurity)
 > Constructs a binary decision tree by evaluating every prospective feature split $s$ to minimize Gini Impurity: $I_G(t) = 1 - \sum_{k=0}^{1} p(k|t)^2$. It selects the optimal split maximizing impurity reduction $\Delta I_G = I_G(t) - \frac{N_L}{N} I_G(t_L) - \frac{N_R}{N} I_G(t_R)$, applying pre-pruning stopping criteria to prevent overfitting.

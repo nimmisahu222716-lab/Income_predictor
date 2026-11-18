@@ -42,7 +42,7 @@ This project presents an empirical research and benchmarking framework comparing
 ---
 ### 2. End-to-End Workflow Sequence
 1. **Data Ingestion & Cleaning:** Load cached `data/adult.csv` (30,162 records) and enforce the standardized 6-feature schema.
-2. **Stratified Split (80:20):** Partition training and test sets while strictly preserving the empirical class ratio ($P(y=1) \\approx 0.249$).
+2. **Stratified Split (80:20):** Partition training and test sets while strictly preserving the empirical class ratio ($P(y=1) \approx 0.249$).
 3. **Model Training:** Fit CART (Gini impurity), ID3 (quantile-discretized Shannon entropy), and Linear SVM (StandardScaler + OneHotEncoder).
 4. **Evaluation & Metric Aggregation:** Compute Accuracy, Precision, Recall, F1-Score, Balanced Accuracy, Specificity, ROC-AUC, and latency.
 5. **Visualizations & Artifacts:** Generate confusion matrix heatmaps, decision tree diagrams, and export `outputs/model_comparison_table.csv`.
@@ -50,22 +50,22 @@ This project presents an empirical research and benchmarking framework comparing
 
 ---
 ### 3. Feature and Target Formulation
-* **Input Feature Subspace $\\mathcal{X}$ (6 Attributes):**
-  - `age`: Continuous chronological age in years ($17 \\le \\text{age} \\le 90$). Binned into 4 balanced quantile intervals for ID3.
-  - `workclass` $\\in$ {`Private`, `Government`, `Self-Employed`}
-  - `education` $\\in$ {`10th`, `12th`, `Graduation`, `Post-Graduation`, `PhD`}
-  - `marital_status` $\\in$ {`Single`, `Married`, `Divorced`, `Widowed`}
-  - `sex` $\\in$ {`Male`, `Female`}
-  - `relationship` $\\in$ {`Husband`, `Wife`, `Child`, `Other`}
-* **Target Space $\\mathcal{Y} = \\{0, 1\\}$:**
-  - $y = 0 \\iff \\text{annual income} \\le \\$50,000$ (Standard Income Class)
-  - $y = 1 \\iff \\text{annual income} > \\$50,000$ (High Income Class)
+* **Input Feature Subspace $\mathcal{X}$ (6 Attributes):**
+  - `age`: Continuous chronological age in years ($17 \le x_1 \le 90$). Binned into 4 balanced quantile intervals for ID3.
+  - `workclass`: Categorical employment sector ($x_2 \in \{\text{Private}, \text{Government}, \text{Self-Employed}\}$)
+  - `education`: Formal educational level ($x_3 \in \{\text{10th}, \text{12th}, \text{Graduation}, \text{Post-Graduation}, \text{PhD}\}$)
+  - `marital_status`: Legal marital status ($x_4 \in \{\text{Single}, \text{Married}, \text{Divorced}, \text{Widowed}\}$)
+  - `sex`: Biological gender ($x_5 \in \{\text{Male}, \text{Female}\}$)
+  - `relationship`: Role in household ($x_6 \in \{\text{Husband}, \text{Wife}, \text{Child}, \text{Other}\}$)
+* **Target Space $\mathcal{Y} = \{0, 1\}$:**
+  - $y = 0 \iff \text{annual income} \le 50\text{K}$ (Standard Income Class: $\le$ \$50,000)
+  - $y = 1 \iff \text{annual income} > 50\text{K}$ (High Income Class: $>$ \$50,000)
 
 ---
 ## Section 1: Setup, Dependencies & Experimental Configuration
 
 **Theoretical Formulation:**
-Configures the computational runtime, sets deterministic pseudorandom seeds ($\\text{seed} = 42$), and initializes thread-safe directory architectures. Establishes global hyperparameters including tree depths, sample limits, and convergence tolerances to ensure strict mathematical reproducibility across all subsequent execution environments.""")
+Configures the computational runtime, sets deterministic pseudorandom seeds ($\text{seed} = 42$), and initializes thread-safe directory architectures. Establishes global hyperparameters including tree depths, sample limits, and convergence tolerances to ensure strict mathematical reproducibility across all subsequent execution environments.""")
 
     add_cell('code', """!pip install -q numpy pandas scikit-learn matplotlib seaborn ucimlrepo
 print("Dependencies installed successfully.")""")
@@ -333,7 +333,7 @@ print(f"Target Distribution: <=50K (Class 0): {(df_cleaned['income_target'] == 0
     add_cell('markdown', r"""## Section 3: Preprocessing Architecture & Stratified Split (80:20)
 
 **Theoretical Formulation:**
-Partitions the sample into training ($80\%$) and testing ($20\%$) subsets using stratified sampling to preserve the empirical class ratio ($P(y=1) \approx 0.249$). Encapsulates preprocessing transformations so that statistical parameters (mean, standard deviation, and categorical bin boundaries) are computed strictly on the training partition, guaranteeing zero data leakage.""")
+Partitions the sample into training (80%) and testing (20%) subsets using stratified sampling to preserve the empirical class ratio ($P(y=1) \approx 0.249$). Encapsulates preprocessing transformations so that statistical parameters (mean, standard deviation, and categorical bin boundaries) are computed strictly on the training partition, guaranteeing zero data leakage.""")
 
     add_cell('code', """class AdaptiveQuantileDiscretizer:
     \"\"\"Learns quantile boundaries strictly on training data for ID3.\"\"\"
@@ -395,10 +395,10 @@ print(f"Stratified Split Completed: {X_train_raw.shape[0]:,} Training records | 
     # =========================================================================
     # SECTION 4: CART Algorithm Implementation
     # =========================================================================
-    add_cell('markdown', """## Section 4: CART Algorithm Implementation (Gini Impurity)
+    add_cell('markdown', r"""## Section 4: CART Algorithm Implementation (Gini Impurity)
 
 **Theoretical Formulation:**
-Constructs a binary decision tree by evaluating every prospective feature split $s$ to minimize Gini Impurity: $I_G(t) = 1 - \\sum_{k=0}^{1} p(k|t)^2$. It selects the optimal split maximizing impurity reduction $\\Delta I_G = I_G(t) - \\frac{N_L}{N} I_G(t_L) - \\frac{N_R}{N} I_G(t_R)$, applying pre-pruning stopping criteria to prevent overfitting.""")
+Constructs a binary decision tree by evaluating every prospective feature split $s$ to minimize Gini Impurity: $I_G(t) = 1 - \sum_{k=0}^{1} p(k|t)^2$. It selects the optimal split maximizing impurity reduction $\Delta I_G = I_G(t) - \frac{N_L}{N} I_G(t_L) - \frac{N_R}{N} I_G(t_R)$, applying pre-pruning stopping criteria to prevent overfitting.""")
 
     add_cell('code', """class CARTClassifierWrapper:
     def __init__(self, max_depth=8, min_samples_split=20, min_samples_leaf=10, random_state=42):
@@ -463,10 +463,10 @@ print("CART Wrapper Ready.")""")
     # =========================================================================
     # SECTION 5: ID3 Algorithm Implementation from Scratch
     # =========================================================================
-    add_cell('markdown', """## Section 5: ID3 Algorithm Implementation from Scratch (Shannon Entropy & Information Gain)
+    add_cell('markdown', r"""## Section 5: ID3 Algorithm Implementation from Scratch (Shannon Entropy & Information Gain)
 
 **Theoretical Formulation:**
-Recursively builds a multi-way decision tree from scratch utilizing Shannon Entropy: $H(S) = - \\sum_{k} p_k \\log_2 p_k$ and Information Gain: $IG(S, A) = H(S) - \\sum_{v} \\frac{|S_v|}{|S|} H(S_v)$. It incorporates an integrated adaptive quantile discretizer that converts continuous numerical variables into balanced discrete partitions to allow genuine nominal multi-way branching.""")
+Recursively builds a multi-way decision tree from scratch utilizing Shannon Entropy: $H(S) = - \sum_{k} p_k \log_2 p_k$ and Information Gain: $IG(S, A) = H(S) - \sum_{v} \frac{|S_v|}{|S|} H(S_v)$. It incorporates an integrated adaptive quantile discretizer that converts continuous numerical variables into balanced discrete partitions to allow genuine nominal multi-way branching.""")
 
     add_cell('code', """class ID3Node:
     def __init__(self, feature=None, children=None, value=None, majority_class=0, prob=0.0, depth=0,
@@ -647,10 +647,10 @@ print("Genuine ID3 Classifier (from scratch) Ready.")""")
     # =========================================================================
     # SECTION 6: Linear SVM Implementation
     # =========================================================================
-    add_cell('markdown', """## Section 6: Linear SVM Implementation (Maximum Margin Hyperplane)
+    add_cell('markdown', r"""## Section 6: Linear SVM Implementation (Maximum Margin Hyperplane)
 
 **Theoretical Formulation:**
-Solves the primal convex quadratic programming optimization problem $\\min_{\\mathbf{w}, b, \\xi} \\frac{1}{2}\\|\\mathbf{w}\\|^2 + C \\sum_{i} \\xi_i$ subject to $y_i(\\mathbf{w}^T \\mathbf{x}_i + b) \\ge 1 - \\xi_i$ and $\\xi_i \\ge 0$. Features are pre-processed via z-score standardization ($\\mu=0, \\sigma=1$) and one-hot encoding, producing a maximal-margin decision boundary accompanied by Platt-scaled posterior probabilities.""")
+Solves the primal convex quadratic programming optimization problem $\min_{\mathbf{w}, b, \xi} \frac{1}{2}\|\mathbf{w}\|^2 + C \sum_{i} \xi_i$ subject to $y_i(\mathbf{w}^T \mathbf{x}_i + b) \ge 1 - \xi_i$ and $\xi_i \ge 0$. Features are pre-processed via z-score standardization ($\mu=0, \sigma=1$) and one-hot encoding, producing a maximal-margin decision boundary accompanied by Platt-scaled posterior probabilities.""")
 
     add_cell('code', """class LinearSVMWrapper:
     def __init__(self, C=1.0, probability=True, random_state=42):
@@ -685,10 +685,10 @@ print("Linear SVM Wrapper Ready.")""")
     # =========================================================================
     # SECTION 7: Model Training & Evaluation Metrics
     # =========================================================================
-    add_cell('markdown', """## Section 7: Model Training & Evaluation Metrics Calculation
+    add_cell('markdown', r"""## Section 7: Model Training & Evaluation Metrics Calculation
 
 **Theoretical Formulation:**
-Executes isolated training for all three models while tracking exact microsecond-level training and prediction latencies. It computes a comprehensive suite of evaluation metrics on unseen test records: Accuracy, Precision, Recall, $F_1\\text{-Score} = 2 \\cdot \\frac{\\text{Precision} \\cdot \\text{Recall}}{\\text{Precision} + \\text{Recall}}$, Balanced Accuracy, Specificity, and ROC-AUC.""")
+Executes isolated training for all three models while tracking exact microsecond-level training and prediction latencies. It computes a comprehensive suite of evaluation metrics on unseen test records: Accuracy, Precision, Recall, $F_1\text{-Score} = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}$, Balanced Accuracy, Specificity, and ROC-AUC.""")
 
     add_cell('code', """models = {}
 train_times = {}
@@ -810,10 +810,10 @@ print(f"  * Highest F1 Score:  {best_f1} ({metrics_results[best_f1]['F1 Score']:
     # =========================================================================
     # SECTION 9: Confusion Matrix Analysis
     # =========================================================================
-    add_cell('markdown', """## Section 9: Confusion Matrix Analysis (CART vs. ID3 vs. Linear SVM)
+    add_cell('markdown', r"""## Section 9: Confusion Matrix Analysis (CART vs. ID3 vs. Linear SVM)
 
 **Theoretical Formulation:**
-Computes and renders side-by-side $2 \\times 2$ contingency heatmaps displaying True Positives ($TP$), False Positives ($FP$), True Negatives ($TN$), and False Negatives ($FN$) for each algorithm. This reveals whether a model's error mode is dominated by Type I errors (over-predicting high income) or Type II errors (failing to identify high earners).""")
+Computes and renders side-by-side $2 \times 2$ contingency heatmaps displaying True Positives ($TP$), False Positives ($FP$), True Negatives ($TN$), and False Negatives ($FN$) for each algorithm. This reveals whether a model's error mode is dominated by Type I errors (over-predicting high income) or Type II errors (failing to identify high earners).""")
 
     add_cell('code', """fig, axes = plt.subplots(1, 3, figsize=(18, 5))
 class_labels = ['<=50K', '>50K']
