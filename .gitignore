@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+data/adult_raw_backup.csv
+*.log
+.DS_Store
