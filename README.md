@@ -10,7 +10,7 @@ An academic, backend-only Machine Learning research benchmark implementing, eval
 ## 1. Project Overview & Core Objectives
 
 ### Project Overview
-This project presents an empirical research and benchmarking framework comparing three fundamental supervised classification paradigms on demographic income prediction: **CART** (Classification and Regression Trees), **ID3** (Iterative Dichotomiser 3, built from scratch using Shannon Entropy), and **Linear SVM** (Support Vector Machine with hard/soft maximum-margin hyperplane). The system predicts whether an individual earns above \$50,000 annually ($>50\text{K}$) or standard income ($\le 50\text{K}$) using a clean 6-feature demographic schema tailored for transparency and cognitive interpretability.
+This project presents an empirical research and benchmarking framework comparing three fundamental supervised classification paradigms on demographic income prediction: **CART** (Classification and Regression Trees), **ID3** (Iterative Dichotomiser 3, built from scratch using Shannon Entropy), and **Linear SVM** (Support Vector Machine with hard/soft maximum-margin hyperplane). The system predicts whether an individual earns above \$50,000 annually ($>50\text{K}$) or standard income ($\le 50\text{K}$) using a clean 9-feature demographic and financial schema (4 numerical, 5 categorical) tailored for transparency and cognitive interpretability.
 
 ### Core Objectives
 1. **Algorithmic Isolation & Benchmark Integrity:** Train, evaluate, and benchmark exactly three distinct classifiers (binary Gini splitting, multi-way Information Gain splitting, and linear margin maximization) on identical 80:20 stratified data splits with zero data leakage.
@@ -78,6 +78,9 @@ $$\mathbf{x}_i = [x_{i, \text{num}}, \mathbf{x}_{i, \text{cat}}] \in \mathcal{X}
 | **`marital_status`** | $x_4 \in \{\text{Single}, \text{Married}, \text{Divorced}, \text{Widowed}\}$ | Legal marital status of the respondent. |
 | **`sex`** | $x_5 \in \{\text{Male}, \text{Female}\}$ | Biological gender classification. |
 | **`relationship`** | $x_6 \in \{\text{Husband}, \text{Wife}, \text{Child}, \text{Other}\}$ | Demographic role within the primary household unit. |
+| **`capital_gain`** | $x_7 \in \mathbb{N}, \quad 0 \le x_7 \le 99999$ | Capital investment gains in USD (zero-inflated; binned into Zero/Low/High for ID3). |
+| **`capital_loss`** | $x_8 \in \mathbb{N}, \quad 0 \le x_8 \le 4356$ | Capital investment losses in USD (zero-inflated; binned into Zero/Low/High for ID3). |
+| **`hours_per_week`** | $x_9 \in \mathbb{N}, \quad 1 \le x_9 \le 99$ | Average working hours per week. Binned into quantile intervals for ID3. |
 
 ### Target Space $\mathcal{Y}$
 The classification target $y \in \{0, 1\}$ is formulated as a binary ground-truth indicator:
@@ -92,7 +95,7 @@ $$y = \begin{cases} 0, & \text{if annual income} \le \$50,000 \quad (\text{Stand
 > Configures the computational runtime, sets deterministic pseudorandom seeds ($\text{seed} = 42$), and initializes thread-safe directory architectures. Establishes global hyperparameters including tree depths, sample limits, and convergence tolerances to ensure strict mathematical reproducibility across all subsequent execution environments.
 
 ### Section 2: Dataset Acquisition & Cleaning (UCI Adult Census Dataset)
-> Handles resilient dataset acquisition across local caching, OpenML, and UCI repositories while eliminating missing tokens (`?`) and unformatted string artifacts. It maps fine-grained demographic subcategories into standardized canonical levels and filters the schema down strictly to the 6 specified attributes plus binary target.
+> Handles resilient dataset acquisition across local caching, OpenML, and UCI repositories while eliminating missing tokens (`?`) and unformatted string artifacts. It maps fine-grained demographic subcategories into standardized canonical levels and filters the schema down strictly to the 9 specified attributes plus binary target.
 
 ### Section 3: Preprocessing Architecture & Stratified Split (80:20)
 > Partitions the sample into training (80%) and testing (20%) subsets using stratified sampling to preserve the empirical class ratio ($P(y=1) \approx 0.249$). Encapsulates preprocessing transformations so that statistical parameters (mean, standard deviation, and categorical bin boundaries) are computed strictly on the training partition, guaranteeing zero data leakage.
@@ -129,9 +132,9 @@ The table below presents empirical metrics obtained across the test dataset (pos
 
 | Algorithm | Accuracy | Precision | Recall | F1 Score | Balanced Accuracy | Specificity | ROC-AUC | Training Time (s) | Prediction Time (s) | Tree Depth | Leaf Nodes | Total Nodes | Support Vectors |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **CART** | 0.7550 | 0.5135 | 0.3800 | 0.4368 | 0.6300 | 0.8800 | 0.7363 | **0.0200** | 0.0089 | 8 | 39 | 77 | *N/A* |
-| **ID3 (Scratch)** | 0.7550 | 0.5116 | **0.4400** | **0.4731** | **0.6500** | 0.8600 | **0.7547** | 0.0511 | **0.0025** | 6 | 43 | 74 | *N/A* |
-| **Linear SVM** | 0.7500 | 0.0000 | 0.0000 | 0.0000 | 0.5000 | **1.0000** | 0.6973 | 0.1353 | 0.0172 | *N/A* | *N/A* | *N/A* | 409 |
+| **CART** | **0.8270** | 0.6910 | 0.5522 | 0.6138 | 0.7352 | 0.9181 | **0.8875** | **0.0187** | 0.0084 | 8 | 71 | 141 | *N/A* |
+| **ID3 (Scratch)** | 0.8240 | 0.6659 | **0.5884** | **0.6247** | **0.7452** | 0.9021 | 0.8741 | 0.1469 | **0.0042** | 6 | 162 | 262 | *N/A* |
+| **Linear SVM** | 0.7905 | **0.7158** | 0.2631 | 0.3847 | 0.6142 | **0.9654** | 0.8596 | 7.0134 | 0.1428 | *N/A* | *N/A* | *N/A* | 3390 |
 
 *Note: Tree depth, leaf count, and total node count are fundamentally Not Applicable (N/A) for Support Vector Machines.*
 
@@ -149,7 +152,7 @@ performance_analysis/
 ├── requirements.txt                                           # Python package requirements
 │
 ├── data/
-│   └── adult.csv                                              # Cleaned 6-feature Dataset (cached locally)
+│   └── adult.csv                                              # Cleaned 9-feature Dataset (cached locally)
 │
 ├── outputs/
 │   ├── confusion_matrices.png                                 # 3-panel Confusion Matrices (CART, ID3, Linear SVM)
@@ -183,13 +186,16 @@ interactive_terminal_prompt(models, discretizer, NUMERICAL_COLS, CATEGORICAL_COL
                             metrics_results=metrics_results, master_table=master_table)
 ```
 
-* **Interactive Prompts:** Sequentially prompts for each of the 6 demographic features:
+* **Interactive Prompts:** Sequentially prompts for each of the 9 features:
   - **`age`**: Numerical integer (e.g., `28`)
   - **`workclass`**: `[1] Private`, `[2] Government`, `[3] Self-Employed`
   - **`education`**: `[1] 10th`, `[2] 12th`, `[3] Graduation`, `[4] Post-Graduation`, `[5] PhD`
   - **`marital_status`**: `[1] Single`, `[2] Married`, `[3] Divorced`, `[4] Widowed`
   - **`sex`**: `[1] Male`, `[2] Female`
   - **`relationship`**: `[1] Husband`, `[2] Wife`, `[3] Child`, `[4] Other`
+  - **`capital_gain`**: Capital investment gains in USD (e.g., `0`)
+  - **`capital_loss`**: Capital investment losses in USD (e.g., `0`)
+  - **`hours_per_week`**: Working hours per week (e.g., `40`)
 * **Smart Defaults:** Every prompt displays a default value in brackets `[default: ...]`. You can press **`[Enter]`** to accept the default or type a custom value.
 * **Instant Prediction Table:** Prints an aligned comparative prediction table displaying predicted income class and confidence percentages across CART, ID3, and Linear SVM.
 * **Master Performance Metrics Matrix:** Automatically prints the full benchmark metrics table in the terminal.

@@ -31,7 +31,7 @@ def create_streamlined_notebook():
 
 ---
 ### 1. Project Overview & Research Objectives
-This project presents an empirical research and benchmarking framework comparing three fundamental supervised classification paradigms on demographic income prediction: **CART** (Classification and Regression Trees), **ID3** (Iterative Dichotomiser 3, built from scratch using Shannon Entropy), and **Linear SVM** (Support Vector Machine with hard/soft maximum-margin hyperplane). The system predicts whether an individual earns above \$50,000 annually ($>50\text{K}$) or standard income ($\le 50\text{K}$) using a clean 6-feature demographic schema tailored for transparency and cognitive interpretability.
+This project presents an empirical research and benchmarking framework comparing three fundamental supervised classification paradigms on demographic income prediction: **CART** (Classification and Regression Trees), **ID3** (Iterative Dichotomiser 3, built from scratch using Shannon Entropy), and **Linear SVM** (Support Vector Machine with hard/soft maximum-margin hyperplane). The system predicts whether an individual earns above \$50,000 annually ($>50\text{K}$) or standard income ($\le 50\text{K}$) using a clean 9-feature demographic and financial schema (4 numerical, 5 categorical) tailored for transparency and cognitive interpretability.
 
 **Core Research Objectives:**
 1. **Algorithmic Isolation & Benchmark Integrity:** Train, evaluate, and benchmark exactly three distinct classifiers (binary Gini splitting, multi-way Information Gain splitting, and linear margin maximization) on identical 80:20 stratified data splits with zero data leakage.
@@ -41,7 +41,7 @@ This project presents an empirical research and benchmarking framework comparing
 
 ---
 ### 2. End-to-End Workflow Sequence
-1. **Data Ingestion & Cleaning:** Load cached `data/adult.csv` (30,162 records) and enforce the standardized 6-feature schema.
+1. **Data Ingestion & Cleaning:** Load cached `data/adult.csv` (30,162 records) and enforce the standardized 9-feature schema.
 2. **Stratified Split (80:20):** Partition training and test sets while strictly preserving the empirical class ratio ($P(y=1) \approx 0.249$).
 3. **Model Training:** Fit CART (Gini impurity), ID3 (quantile-discretized Shannon entropy), and Linear SVM (StandardScaler + OneHotEncoder).
 4. **Evaluation & Metric Aggregation:** Compute Accuracy, Precision, Recall, F1-Score, Balanced Accuracy, Specificity, ROC-AUC, and latency.
@@ -50,13 +50,16 @@ This project presents an empirical research and benchmarking framework comparing
 
 ---
 ### 3. Feature and Target Formulation
-* **Input Feature Subspace $\mathcal{X}$ (6 Attributes):**
+* **Input Feature Subspace $\mathcal{X}$ (9 Attributes):**
   - `age`: Continuous chronological age in years ($17 \le x_1 \le 90$). Binned into 4 balanced quantile intervals for ID3.
   - `workclass`: Categorical employment sector ($x_2 \in \{\text{Private}, \text{Government}, \text{Self-Employed}\}$)
   - `education`: Formal educational level ($x_3 \in \{\text{10th}, \text{12th}, \text{Graduation}, \text{Post-Graduation}, \text{PhD}\}$)
   - `marital_status`: Legal marital status ($x_4 \in \{\text{Single}, \text{Married}, \text{Divorced}, \text{Widowed}\}$)
   - `sex`: Biological gender ($x_5 \in \{\text{Male}, \text{Female}\}$)
   - `relationship`: Role in household ($x_6 \in \{\text{Husband}, \text{Wife}, \text{Child}, \text{Other}\}$)
+  - `capital_gain`: Capital investment gains in USD ($x_7 \in [0, 99999]$, zero-inflated)
+  - `capital_loss`: Capital investment losses in USD ($x_8 \in [0, 4356]$, zero-inflated)
+  - `hours_per_week`: Average working hours per week ($x_9 \in [1, 99]$)
 * **Target Space $\mathcal{Y} = \{0, 1\}$:**
   - $y = 0 \iff \text{annual income} \le 50\text{K}$ (Standard Income Class: $\le$ \$50,000)
   - $y = 1 \iff \text{annual income} > 50\text{K}$ (High Income Class: $>$ \$50,000)
@@ -126,10 +129,10 @@ print("Libraries imported and experimental parameters configured.")""")
     # =========================================================================
     # SECTION 2: Dataset Acquisition & Cleaning
     # =========================================================================
-    add_cell('markdown', """## Section 2: Dataset Acquisition & Cleaning (UCI Adult Census Dataset)
+    add_cell('markdown', r"""## Section 2: Dataset Acquisition & Cleaning (UCI Adult Census Dataset)
 
 **Theoretical Formulation:**
-Handles resilient dataset acquisition across local caching, OpenML, and UCI repositories while eliminating missing tokens (`?`) and unformatted string artifacts. It maps fine-grained demographic subcategories into standardized canonical levels and filters the schema down strictly to the 6 specified attributes plus binary target.""")
+Handles resilient dataset acquisition across local caching, OpenML, and UCI repositories while eliminating missing tokens (`?`) and unformatted string artifacts. It maps fine-grained demographic subcategories into standardized canonical levels and filters the schema down strictly to the 9 specified attributes plus binary target.""")
 
     add_cell('code', """DATA_COLUMNS = [
     'age', 'workclass', 'fnlwgt', 'education', 'education_num',
@@ -137,7 +140,7 @@ Handles resilient dataset acquisition across local caching, OpenML, and UCI repo
     'capital_gain', 'capital_loss', 'hours_per_week', 'native_country', 'income'
 ]
 
-local_candidates = ['data/adult.csv', 'adult.csv', '/content/data/adult.csv', '/content/adult.csv']
+local_candidates = ['data/adult.csv', 'data/adult_raw_backup.csv', 'adult.csv', '/content/data/adult.csv', '/content/adult.csv']
 df_raw = None
 
 # Tier 1: Local Cache Check
@@ -149,7 +152,7 @@ for lp in local_candidates:
             df_raw.columns = [col.replace('-', '_').strip() for col in df_raw.columns]
             if 'class' in df_raw.columns and 'income' not in df_raw.columns:
                 df_raw = df_raw.rename(columns={'class': 'income'})
-            if len(df_raw.columns) >= 14:
+            if len(df_raw.columns) >= 10:
                 print("Loaded successfully from local storage!")
                 break
         except Exception:
@@ -240,8 +243,8 @@ for col in df_cleaned.columns:
 
 df_cleaned = df_cleaned.replace('?', np.nan).replace('None', np.nan).replace('nan', np.nan)
 
-# Clean, intuitive 6-feature schema as requested:
-NUMERICAL_COLS = ['age']
+# Clean, intuitive 9-feature schema (4 numerical, 5 categorical):
+NUMERICAL_COLS = ['age', 'capital_gain', 'capital_loss', 'hours_per_week']
 CATEGORICAL_COLS = ['workclass', 'education', 'marital_status', 'sex', 'relationship']
 SELECTED_FEATURES = NUMERICAL_COLS + CATEGORICAL_COLS
 
@@ -323,7 +326,7 @@ target_str = df_cleaned['income'].astype(str).str.strip().str.rstrip('.')
 df_cleaned['income_target'] = target_str.map(lambda x: 1 if '>50k' in str(x).lower() else 0).astype(int)
 
 print(f"Data Cleaning Completed: {n_init:,} raw -> {n_clean:,} clean records (Removed {n_init - n_clean:,} rows).")
-print(f"Features Retained (6): {SELECTED_FEATURES}")
+print(f"Features Retained (9): {SELECTED_FEATURES}")
 print(f"Target Distribution: <=50K (Class 0): {(df_cleaned['income_target'] == 0).sum():,} ({(df_cleaned['income_target'] == 0).mean()*100:.1f}%) | "
       f">50K (Class 1): {(df_cleaned['income_target'] == 1).sum():,} ({(df_cleaned['income_target'] == 1).mean()*100:.1f}%)")""")
 
@@ -1003,13 +1006,25 @@ def interactive_terminal_prompt(models, discretizer, num_cols, cat_cols, metrics
     rel_choices = ['Husband', 'Wife', 'Child', 'Other']
     relationship = ask_choice("6. Relationship in Household", rel_choices, 'Husband')
 
+    # 7. Capital Gain
+    capital_gain = ask_num("7. Capital Gain (USD)", 0)
+
+    # 8. Capital Loss
+    capital_loss = ask_num("8. Capital Loss (USD)", 0)
+
+    # 9. Working Hours per Week
+    hours_per_week = ask_num("9. Working Hours per Week", 40)
+
     user_dict = {
         'age': age,
         'workclass': workclass,
         'education': education,
         'marital_status': marital_status,
         'sex': sex,
-        'relationship': relationship
+        'relationship': relationship,
+        'capital_gain': capital_gain,
+        'capital_loss': capital_loss,
+        'hours_per_week': hours_per_week
     }
 
     print("\\n" + "-" * 80)

@@ -15,7 +15,7 @@ def predict_sample(sample_input, models, discretizer, num_cols, cat_cols):
     Parameters:
     -----------
     sample_input : dict or pd.DataFrame
-        Dictionary or DataFrame containing all 6 required features.
+        Dictionary or DataFrame containing all 9 required features.
     models : dict
         Trained models dictionary {'CART': cart_wrapper, 'ID3': id3_clf, 'Linear SVM': svm_wrapper}.
     discretizer : AdaptiveQuantileDiscretizer
@@ -177,13 +177,25 @@ def interactive_terminal_prompt(models, discretizer, num_cols, cat_cols, metrics
     rel_choices = ['Husband', 'Wife', 'Child', 'Other']
     relationship = ask_choice("6. Relationship in Household", rel_choices, 'Husband')
 
+    # 7. Capital Gain
+    capital_gain = ask_num("7. Capital Gain (USD)", 0)
+
+    # 8. Capital Loss
+    capital_loss = ask_num("8. Capital Loss (USD)", 0)
+
+    # 9. Working Hours per Week
+    hours_per_week = ask_num("9. Working Hours per Week", 40)
+
     user_dict = {
         'age': age,
         'workclass': workclass,
         'education': education,
         'marital_status': marital_status,
         'sex': sex,
-        'relationship': relationship
+        'relationship': relationship,
+        'capital_gain': capital_gain,
+        'capital_loss': capital_loss,
+        'hours_per_week': hours_per_week
     }
 
     print("\n" + "-" * 80)

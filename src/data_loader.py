@@ -19,8 +19,8 @@ DATA_COLUMNS = [
     'capital_gain', 'capital_loss', 'hours_per_week', 'native_country', 'income'
 ]
 
-# Clean, intuitive, universal feature set (6 attributes as requested)
-NUMERICAL_COLS = ['age']
+# Clean, intuitive, universal feature set (9 attributes: 4 numerical, 5 categorical)
+NUMERICAL_COLS = ['age', 'capital_gain', 'capital_loss', 'hours_per_week']
 CATEGORICAL_COLS = ['workclass', 'education', 'marital_status', 'sex', 'relationship']
 SELECTED_FEATURES = NUMERICAL_COLS + CATEGORICAL_COLS
 
@@ -166,17 +166,10 @@ def download_and_load_dataset(data_dir='data', filename='adult.csv'):
 
 def clean_dataset(df):
     """
-    Cleans raw dataset and retains only the 7 clean, intuitive attributes:
-    - Numerical: age, hours_per_week
-    - Categorical: workclass, education, marital_status, occupation, sex
+    Cleans raw dataset and retains the 9 intuitive attributes:
+    - Numerical (4): age, capital_gain, capital_loss, hours_per_week
+    - Categorical (5): workclass, education, marital_status, sex, relationship
     - Target: income (<=50K -> 0, >50K -> 1)
-
-    Eliminates redundant/US-specific attributes:
-    - Drops 'fnlwgt' (census population weight)
-    - Drops 'race' and 'native_country' (US-specific demographics)
-    - Drops 'relationship' (redundant with marital_status + sex)
-    - Drops 'education_num' (redundant duplicate of education degree)
-    - Drops 'capital_gain' and 'capital_loss' (92% zeros, US investment tax forms)
     """
     df_clean = df.copy()
 
@@ -284,9 +277,9 @@ def clean_dataset(df):
     # Retain all valid survey respondents (identical profiles reflect demographic density)
     n_final = len(df_clean)
 
-    print(f"[DataLoader] Cleaned dataset (Simplified 6-Feature Schema):")
+    print(f"[DataLoader] Cleaned dataset (9-Feature Schema):")
     print(f"  - Total clean survey records: {n_final:,}")
-    print(f"  - Retained features (6): {SELECTED_FEATURES}")
+    print(f"  - Retained features (9): {SELECTED_FEATURES}")
 
     # Encode binary target: 0 = <=50K, 1 = >50K
     target_str = df_clean['income'].astype(str).str.strip().str.rstrip('.')
