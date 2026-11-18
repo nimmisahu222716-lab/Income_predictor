@@ -146,7 +146,8 @@ The table below presents empirical metrics obtained across the test dataset (pos
 performance_analysis/
 │
 ├── Comparative_Performance_Analysis_CART_ID3_LinearSVM.ipynb  # Primary Google Colab Notebook (Run all ready)
-├── run_project.py                                             # Local Python execution entry point
+├── interactive_predict.py                                     # Dedicated Interactive Terminal Predictor
+├── run_project.py                                             # Master benchmark pipeline entry point
 ├── generate_notebook.py                                       # Generator script for .ipynb
 ├── README.md                                                  # Comprehensive documentation
 ├── requirements.txt                                           # Python package requirements
@@ -176,30 +177,34 @@ performance_analysis/
 
 ---
 
-## 7. Interactive Terminal Prediction Interface
+## 7. Interactive Prediction Interfaces
 
-To evaluate any custom individual demographic record across **CART**, **ID3**, and **Linear SVM**, run the interactive terminal interface in Section 11 of the Colab notebook or from the CLI:
+The project provides two flexible ways to evaluate custom demographic profiles across **CART**, **ID3**, and **Linear SVM**:
 
-```python
-# Launch interactive terminal prompt in Google Colab (Section 11)
-interactive_terminal_prompt(models, discretizer, NUMERICAL_COLS, CATEGORICAL_COLS,
-                            metrics_results=metrics_results, master_table=master_table)
+### Mode 1: Live Interactive GUI Form (Google Colab - Section 11.1)
+Adjust sliders and dropdown menus in real time. Colab automatically re-evaluates the profile on change:
+- **`age`**: Slider ($17$ to $90$)
+- **`workclass`**: Dropdown (`Private`, `Government`, `Self-Employed`)
+- **`education`**: Dropdown (`10th`, `12th`, `Graduation`, `Post-Graduation`, `PhD`)
+- **`marital_status`**: Dropdown (`Single`, `Married`, `Divorced`, `Widowed`)
+- **`sex`**: Dropdown (`Male`, `Female`)
+- **`relationship`**: Dropdown (`Husband`, `Wife`, `Child`, `Other`)
+- **`capital_gain`**: Integer input ($0$ to $99,999$)
+- **`capital_loss`**: Integer input ($0$ to $4,356$)
+- **`hours_per_week`**: Slider ($1$ to $99$)
+
+### Mode 2: Dedicated Interactive Terminal CLI (`interactive_predict.py` & Section 11.2)
+Run step-by-step console prompts with numbered choices and smart defaults:
+
+```bash
+# Launch interactive terminal prediction session locally:
+python interactive_predict.py
 ```
 
-* **Interactive Prompts:** Sequentially prompts for each of the 9 features:
-  - **`age`**: Numerical integer (e.g., `28`)
-  - **`workclass`**: `[1] Private`, `[2] Government`, `[3] Self-Employed`
-  - **`education`**: `[1] 10th`, `[2] 12th`, `[3] Graduation`, `[4] Post-Graduation`, `[5] PhD`
-  - **`marital_status`**: `[1] Single`, `[2] Married`, `[3] Divorced`, `[4] Widowed`
-  - **`sex`**: `[1] Male`, `[2] Female`
-  - **`relationship`**: `[1] Husband`, `[2] Wife`, `[3] Child`, `[4] Other`
-  - **`capital_gain`**: Capital investment gains in USD (e.g., `0`)
-  - **`capital_loss`**: Capital investment losses in USD (e.g., `0`)
-  - **`hours_per_week`**: Working hours per week (e.g., `40`)
-* **Smart Defaults:** Every prompt displays a default value in brackets `[default: ...]`. You can press **`[Enter]`** to accept the default or type a custom value.
-* **Instant Prediction Table:** Prints an aligned comparative prediction table displaying predicted income class and confidence percentages across CART, ID3, and Linear SVM.
-* **Master Performance Metrics Matrix:** Automatically prints the full benchmark metrics table in the terminal.
-* **Confusion Matrix for All Algorithms:** Displays the 2x2 confusion matrix for each algorithm directly in the terminal output.
+* **Smart Defaults:** Every prompt displays a default value in brackets `[default: ...]`. Press **`[Enter]`** to accept the default or type a custom value.
+* **Instant Multi-Model Comparison:** Prints predicted income class (`<=50K` or `>50K`) and confidence percentages across CART, ID3, and Linear SVM.
+* **Master Performance Metrics Matrix:** Automatically prints the full benchmark metrics table and confusion matrices in the terminal.
+* **Session Loop:** Continues prompting for new profiles until you choose to exit.
 
 ---
 
@@ -209,7 +214,7 @@ interactive_terminal_prompt(models, discretizer, NUMERICAL_COLS, CATEGORICAL_COL
 1. Navigate to [Google Colab](https://colab.research.google.com).
 2. Click **Upload** and upload `Comparative_Performance_Analysis_CART_ID3_LinearSVM.ipynb`.
 3. In the menu bar, select **Runtime > Run all**.
-4. The notebook will automatically download the dataset, execute data preprocessing, train all three models, display the master comparison table (Section 8), confusion matrices (Section 9), render the **CART and ID3 Decision Tree Diagrams** (Section 10), and execute the **Interactive Prediction Interface** (Section 11).
+4. The notebook will automatically download the dataset, execute data preprocessing, train all three models, display the master comparison table (Section 8), confusion matrices (Section 9), render the **CART and ID3 Decision Tree Diagrams** (Section 10), and render the **Live Interactive Prediction Form** (Section 11.1).
 
 ### Option B: Local Python Execution
 ```bash
@@ -219,9 +224,9 @@ cd performance_analysis
 # Install dependencies
 pip install -r requirements.txt
 
-# Run full project pipeline
+# Run full project pipeline & generate visualization artifacts
 python run_project.py
 
-# Run pipeline with interactive terminal prompt at the end
-python run_project.py --interactive
+# Launch interactive prediction terminal directly
+python interactive_predict.py
 ```

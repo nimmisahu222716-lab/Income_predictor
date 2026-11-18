@@ -1068,10 +1068,47 @@ def interactive_terminal_prompt(models, discretizer, num_cols, cat_cols, metrics
 
     return res_df""")
 
-    add_cell('markdown', """### Launch Terminal Prediction Prompt
-Run this cell to start the interactive prompt directly in Google Colab!""")
+    add_cell('markdown', r"""### 11.1 Live Interactive Prediction Form (GUI)
+Use the interactive sliders and dropdowns below to test arbitrary demographic profiles in real time with automatic re-evaluation across all three models!""")
 
-    add_cell('code', """# RUN INTERACTIVE TERMINAL IN GOOGLE COLAB
+    add_cell('code', """#@title 🎯 Live Interactive Demographic Predictor { run: "auto" }
+#@markdown Adjust the demographic and financial parameters below to immediately generate predictions across **CART**, **ID3**, and **Linear SVM**:
+
+age = 35 #@param {type:"slider", min:17, max:90, step:1}
+workclass = "Private" #@param ["Private", "Government", "Self-Employed"]
+education = "Graduation" #@param ["10th", "12th", "Graduation", "Post-Graduation", "PhD"]
+marital_status = "Married" #@param ["Single", "Married", "Divorced", "Widowed"]
+sex = "Male" #@param ["Male", "Female"]
+relationship = "Husband" #@param ["Husband", "Wife", "Child", "Other"]
+capital_gain = 0 #@param {type:"integer"}
+capital_loss = 0 #@param {type:"integer"}
+hours_per_week = 40 #@param {type:"slider", min:1, max:99, step:1}
+
+custom_profile = {
+    'age': int(age),
+    'workclass': str(workclass),
+    'education': str(education),
+    'marital_status': str(marital_status),
+    'sex': str(sex),
+    'relationship': str(relationship),
+    'capital_gain': int(capital_gain),
+    'capital_loss': int(capital_loss),
+    'hours_per_week': int(hours_per_week)
+}
+
+# Run live prediction across all three models
+live_prediction_df = predict_income(custom_profile, models, discretizer, NUMERICAL_COLS, CATEGORICAL_COLS)
+
+print("=" * 80)
+print(f"PROFILE: Age={age} | {workclass} | {education} | {marital_status} | {sex} | {relationship} | Gain=${capital_gain:,} | Loss=${capital_loss:,} | {hours_per_week}h/wk")
+print("=" * 80)
+display(live_prediction_df)
+print("=" * 80)""")
+
+    add_cell('markdown', r"""### 11.2 Step-by-Step Console Input (Optional)
+Run this cell if you want to enter features one by one via text prompts in the console window.""")
+
+    add_cell('code', """# RUN INTERACTIVE CONSOLE PROMPT IN GOOGLE COLAB
 interactive_terminal_prompt(models, discretizer, NUMERICAL_COLS, CATEGORICAL_COLS,
                             metrics_results=metrics_results, master_table=master_table)""")
 
