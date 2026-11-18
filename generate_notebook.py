@@ -27,19 +27,45 @@ def create_streamlined_notebook():
     # =========================================================================
     # SECTION 1: Setup, Dependencies & Configuration
     # =========================================================================
-    add_cell('markdown', """# Comparative Performance Analysis of CART, ID3 and Linear SVM for Classification
+    add_cell('markdown', r"""# Comparative Performance Analysis of CART, ID3 and Linear Support Vector Machine (SVM) Algorithms for Classification
 
 ---
-### Machine Learning Research Benchmark
-* **Dataset:** UCI Adult Income Census Dataset
-* **Task:** Binary Classification (`<=50K` vs. `>50K`)
-* **Algorithms Evaluated:**
-  1. **CART** (`DecisionTreeClassifier`, `criterion='gini'`, `splitter='best'`, `random_state=42`)
-  2. **ID3** (Genuine Scratch Implementation with Shannon Entropy & Information Gain)
-  3. **Linear SVM** (`SVC(kernel='linear', C=1.0, probability=True, random_state=42)`)
+### 1. Project Overview & Research Objectives
+This project presents an empirical research and benchmarking framework comparing three fundamental supervised classification paradigms on demographic income prediction: **CART** (Classification and Regression Trees), **ID3** (Iterative Dichotomiser 3, built from scratch using Shannon Entropy), and **Linear SVM** (Support Vector Machine with hard/soft maximum-margin hyperplane). The system predicts whether an individual earns above \$50,000 annually ($>50\text{K}$) or standard income ($\le 50\text{K}$) using a clean 6-feature demographic schema tailored for transparency and cognitive interpretability.
+
+**Core Research Objectives:**
+1. **Algorithmic Isolation & Benchmark Integrity:** Train, evaluate, and benchmark exactly three distinct classifiers (binary Gini splitting, multi-way Information Gain splitting, and linear margin maximization) on identical 80:20 stratified data splits with zero data leakage.
+2. **Scratch vs. Library Implementation Analysis:** Compare scikit-learn's optimized CART and Linear SVM against a scratch-built ID3 engine featuring continuous quantile discretization and recursive Shannon entropy minimization.
+3. **Interpretability vs. Boundary Complexity Trade-off:** Contrast the explicit rule-based hierarchical decision branches of CART and ID3 against the geometric separating hyperplane and support vector distribution of Linear SVM.
+4. **Interactive Sub-Second Inference:** Provide an interactive terminal interface that prompts users for demographic attributes and immediately computes predicted income classes, posterior probabilities, the master performance table, and confusion matrices.
 
 ---
-## Section 1: Setup, Dependencies & Experimental Configuration""")
+### 2. End-to-End Workflow Sequence
+1. **Data Ingestion & Cleaning:** Load cached `data/adult.csv` (30,162 records) and enforce the standardized 6-feature schema.
+2. **Stratified Split (80:20):** Partition training and test sets while strictly preserving the empirical class ratio ($P(y=1) \\approx 0.249$).
+3. **Model Training:** Fit CART (Gini impurity), ID3 (quantile-discretized Shannon entropy), and Linear SVM (StandardScaler + OneHotEncoder).
+4. **Evaluation & Metric Aggregation:** Compute Accuracy, Precision, Recall, F1-Score, Balanced Accuracy, Specificity, ROC-AUC, and latency.
+5. **Visualizations & Artifacts:** Generate confusion matrix heatmaps, decision tree diagrams, and export `outputs/model_comparison_table.csv`.
+6. **Interactive Terminal Inference:** Live command-line custom profile prediction interface.
+
+---
+### 3. Feature and Target Formulation
+* **Input Feature Subspace $\\mathcal{X}$ (6 Attributes):**
+  - `age`: Continuous chronological age in years ($17 \\le \\text{age} \\le 90$). Binned into 4 balanced quantile intervals for ID3.
+  - `workclass` $\\in$ {`Private`, `Government`, `Self-Employed`}
+  - `education` $\\in$ {`10th`, `12th`, `Graduation`, `Post-Graduation`, `PhD`}
+  - `marital_status` $\\in$ {`Single`, `Married`, `Divorced`, `Widowed`}
+  - `sex` $\\in$ {`Male`, `Female`}
+  - `relationship` $\\in$ {`Husband`, `Wife`, `Child`, `Other`}
+* **Target Space $\\mathcal{Y} = \\{0, 1\\}$:**
+  - $y = 0 \\iff \\text{annual income} \\le \\$50,000$ (Standard Income Class)
+  - $y = 1 \\iff \\text{annual income} > \\$50,000$ (High Income Class)
+
+---
+## Section 1: Setup, Dependencies & Experimental Configuration
+
+**Theoretical Formulation:**
+Configures the computational runtime, sets deterministic pseudorandom seeds ($\\text{seed} = 42$), and initializes thread-safe directory architectures. Establishes global hyperparameters including tree depths, sample limits, and convergence tolerances to ensure strict mathematical reproducibility across all subsequent execution environments.""")
 
     add_cell('code', """!pip install -q numpy pandas scikit-learn matplotlib seaborn ucimlrepo
 print("Dependencies installed successfully.")""")
@@ -102,8 +128,8 @@ print("Libraries imported and experimental parameters configured.")""")
     # =========================================================================
     add_cell('markdown', """## Section 2: Dataset Acquisition & Cleaning (UCI Adult Census Dataset)
 
-Acquires the dataset using a resilient multi-tier loading strategy (Local Cache $\\to$ Scikit-Learn OpenML $\\to$ `ucimlrepo` $\\to$ Curated HTTP Mirrors $\\to$ Fallback).
-Performs standardized missing value cleaning, whitespace normalization, duplicate removal, and target class encoding.""")
+**Theoretical Formulation:**
+Handles resilient dataset acquisition across local caching, OpenML, and UCI repositories while eliminating missing tokens (`?`) and unformatted string artifacts. It maps fine-grained demographic subcategories into standardized canonical levels and filters the schema down strictly to the 6 specified attributes plus binary target.""")
 
     add_cell('code', """DATA_COLUMNS = [
     'age', 'workclass', 'fnlwgt', 'education', 'education_num',
@@ -304,12 +330,10 @@ print(f"Target Distribution: <=50K (Class 0): {(df_cleaned['income_target'] == 0
     # =========================================================================
     # SECTION 3: Feature Preprocessing & Stratified Train-Test Split (80:20)
     # =========================================================================
-    add_cell('markdown', """## Section 3: Preprocessing Architecture & Stratified Split (80:20)
+    add_cell('markdown', r"""## Section 3: Preprocessing Architecture & Stratified Split (80:20)
 
-* **Leakage Prevention:** All transformation rules and discretization boundaries are learned strictly from training data.
-* **ID3:** Continuous numerical attributes are discretized into quantile bins (`AdaptiveQuantileDiscretizer`).
-* **CART:** Categorical attributes encoded using `OrdinalEncoder`.
-* **Linear SVM:** Continuous attributes standardized via `StandardScaler`; categoricals encoded via `OneHotEncoder`.""")
+**Theoretical Formulation:**
+Partitions the sample into training ($80\%$) and testing ($20\%$) subsets using stratified sampling to preserve the empirical class ratio ($P(y=1) \approx 0.249$). Encapsulates preprocessing transformations so that statistical parameters (mean, standard deviation, and categorical bin boundaries) are computed strictly on the training partition, guaranteeing zero data leakage.""")
 
     add_cell('code', """class AdaptiveQuantileDiscretizer:
     \"\"\"Learns quantile boundaries strictly on training data for ID3.\"\"\"
@@ -371,7 +395,10 @@ print(f"Stratified Split Completed: {X_train_raw.shape[0]:,} Training records | 
     # =========================================================================
     # SECTION 4: CART Algorithm Implementation
     # =========================================================================
-    add_cell('markdown', """## Section 4: CART Algorithm Implementation (Gini Impurity)""")
+    add_cell('markdown', """## Section 4: CART Algorithm Implementation (Gini Impurity)
+
+**Theoretical Formulation:**
+Constructs a binary decision tree by evaluating every prospective feature split $s$ to minimize Gini Impurity: $I_G(t) = 1 - \\sum_{k=0}^{1} p(k|t)^2$. It selects the optimal split maximizing impurity reduction $\\Delta I_G = I_G(t) - \\frac{N_L}{N} I_G(t_L) - \\frac{N_R}{N} I_G(t_R)$, applying pre-pruning stopping criteria to prevent overfitting.""")
 
     add_cell('code', """class CARTClassifierWrapper:
     def __init__(self, max_depth=8, min_samples_split=20, min_samples_leaf=10, random_state=42):
@@ -436,7 +463,10 @@ print("CART Wrapper Ready.")""")
     # =========================================================================
     # SECTION 5: ID3 Algorithm Implementation from Scratch
     # =========================================================================
-    add_cell('markdown', """## Section 5: ID3 Algorithm Implementation from Scratch (Shannon Entropy & Information Gain)""")
+    add_cell('markdown', """## Section 5: ID3 Algorithm Implementation from Scratch (Shannon Entropy & Information Gain)
+
+**Theoretical Formulation:**
+Recursively builds a multi-way decision tree from scratch utilizing Shannon Entropy: $H(S) = - \\sum_{k} p_k \\log_2 p_k$ and Information Gain: $IG(S, A) = H(S) - \\sum_{v} \\frac{|S_v|}{|S|} H(S_v)$. It incorporates an integrated adaptive quantile discretizer that converts continuous numerical variables into balanced discrete partitions to allow genuine nominal multi-way branching.""")
 
     add_cell('code', """class ID3Node:
     def __init__(self, feature=None, children=None, value=None, majority_class=0, prob=0.0, depth=0,
@@ -617,7 +647,10 @@ print("Genuine ID3 Classifier (from scratch) Ready.")""")
     # =========================================================================
     # SECTION 6: Linear SVM Implementation
     # =========================================================================
-    add_cell('markdown', """## Section 6: Linear SVM Implementation (Maximum Margin Hyperplane)""")
+    add_cell('markdown', """## Section 6: Linear SVM Implementation (Maximum Margin Hyperplane)
+
+**Theoretical Formulation:**
+Solves the primal convex quadratic programming optimization problem $\\min_{\\mathbf{w}, b, \\xi} \\frac{1}{2}\\|\\mathbf{w}\\|^2 + C \\sum_{i} \\xi_i$ subject to $y_i(\\mathbf{w}^T \\mathbf{x}_i + b) \\ge 1 - \\xi_i$ and $\\xi_i \\ge 0$. Features are pre-processed via z-score standardization ($\\mu=0, \\sigma=1$) and one-hot encoding, producing a maximal-margin decision boundary accompanied by Platt-scaled posterior probabilities.""")
 
     add_cell('code', """class LinearSVMWrapper:
     def __init__(self, C=1.0, probability=True, random_state=42):
@@ -654,7 +687,8 @@ print("Linear SVM Wrapper Ready.")""")
     # =========================================================================
     add_cell('markdown', """## Section 7: Model Training & Evaluation Metrics Calculation
 
-Trains all three algorithms on identical training observations, benchmarks execution latencies with `time.perf_counter()`, and computes all evaluation metrics on the test dataset.""")
+**Theoretical Formulation:**
+Executes isolated training for all three models while tracking exact microsecond-level training and prediction latencies. It computes a comprehensive suite of evaluation metrics on unseen test records: Accuracy, Precision, Recall, $F_1\\text{-Score} = 2 \\cdot \\frac{\\text{Precision} \\cdot \\text{Recall}}{\\text{Precision} + \\text{Recall}}$, Balanced Accuracy, Specificity, and ROC-AUC.""")
 
     add_cell('code', """models = {}
 train_times = {}
@@ -720,7 +754,10 @@ for a in ['CART', 'ID3', 'Linear SVM']:
     # =========================================================================
     # SECTION 8: Master Comparative Performance Table
     # =========================================================================
-    add_cell('markdown', """## Section 8: Master Comparative Performance Table""")
+    add_cell('markdown', """## Section 8: Master Comparative Performance Table
+
+**Theoretical Formulation:**
+Aggregates empirical metric vectors, execution latencies, and architectural complexity indicators (tree depth, leaf counts, node counts, support vectors) into a unified comparative DataFrame. It automatically parses category leaders across accuracy, precision, recall, and computational efficiency, serializing results to `outputs/model_comparison_table.csv`.""")
 
     add_cell('code', """cart_complex = models['CART'].get_tree_metrics()
 id3_complex = models['ID3'].get_tree_metrics()
@@ -775,7 +812,8 @@ print(f"  * Highest F1 Score:  {best_f1} ({metrics_results[best_f1]['F1 Score']:
     # =========================================================================
     add_cell('markdown', """## Section 9: Confusion Matrix Analysis (CART vs. ID3 vs. Linear SVM)
 
-Evaluates True Positives, False Positives, True Negatives, and False Negatives across all three models.""")
+**Theoretical Formulation:**
+Computes and renders side-by-side $2 \\times 2$ contingency heatmaps displaying True Positives ($TP$), False Positives ($FP$), True Negatives ($TN$), and False Negatives ($FN$) for each algorithm. This reveals whether a model's error mode is dominated by Type I errors (over-predicting high income) or Type II errors (failing to identify high earners).""")
 
     add_cell('code', """fig, axes = plt.subplots(1, 3, figsize=(18, 5))
 class_labels = ['<=50K', '>50K']
@@ -803,9 +841,8 @@ plt.show()""")
     # =========================================================================
     add_cell('markdown', """## Section 10: Decision Tree Architecture Visualizations (CART & ID3)
 
-Visualizing the learned decision rules for both tree-based algorithms:
-1. **CART (Gini Impurity):** Binary recursive splits with sample counts and Gini impurity.
-2. **ID3 (Shannon Entropy):** Multi-way categorical branches with Information Gain and Entropy.""")
+**Theoretical Formulation:**
+Graphically renders the internal decision logic of the tree-based models: CART's binary splits with sample distributions and Gini scores, alongside ID3's multi-way nominal decision paths with Information Gain and node entropies. This provides direct human interpretability of the learned rules governing high versus standard income classifications.""")
 
     add_cell('code', """# 1. Visualize CART Decision Tree Diagram
 print("Rendering CART Decision Tree Diagram...")
@@ -822,8 +859,8 @@ plt.show()""")
     # =========================================================================
     add_cell('markdown', """## Section 11: Interactive Colab Terminal Prediction & Performance Matrix
 
-Enables interactive evaluation of custom individual records directly in the Google Colab terminal.
-Displays predicted income, confidence scores, the complete performance comparison matrix, and confusion matrices.""")
+**Theoretical Formulation:**
+Provides a live command-line interface in Google Colab that sequentially prompts users for demographic inputs with numbered choices and intelligent defaults. It routes the vector through the trained pipelines to display predicted income, model confidence percentages, the master benchmark comparison table, and side-by-side confusion matrices in a single view.""")
 
     add_cell('code', """def predict_income(sample_dict, models, discretizer, num_cols, cat_cols):
     \"\"\"Generates comparative predictions for a custom user input record across all 3 models.\"\"\"
