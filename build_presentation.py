@@ -48,28 +48,6 @@ def create_deck():
         b2.fill.fore_color.rgb = MUTED_BLUE
         b2.line.fill.background()
 
-        # Top-right frame line
-        top_line = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(9.8), Inches(0.4), Inches(3.1), Inches(0.04))
-        top_line.fill.solid()
-        top_line.fill.fore_color.rgb = SLATE
-        top_line.line.fill.background()
-        
-        top_tick = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(12.86), Inches(0.4), Inches(0.04), Inches(0.7))
-        top_tick.fill.solid()
-        top_tick.fill.fore_color.rgb = SLATE
-        top_tick.line.fill.background()
-
-        # Bottom-left frame line
-        bot_tick = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.45), Inches(6.3), Inches(0.04), Inches(0.8))
-        bot_tick.fill.solid()
-        bot_tick.fill.fore_color.rgb = SLATE
-        bot_tick.line.fill.background()
-
-        bot_line = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.45), Inches(7.06), Inches(3.2), Inches(0.04))
-        bot_line.fill.solid()
-        bot_line.fill.fore_color.rgb = SLATE
-        bot_line.line.fill.background()
-
         # Title & Category Header Box
         header_box = slide.shapes.add_textbox(Inches(1.5), Inches(0.35), Inches(8.2), Inches(1.0))
         tf = header_box.text_frame
@@ -96,7 +74,7 @@ def create_deck():
         footer_box = slide.shapes.add_textbox(Inches(3.8), Inches(7.15), Inches(6.0), Inches(0.3))
         ftf = footer_box.text_frame
         p_foot = ftf.paragraphs[0]
-        p_foot.text = "Comparative Benchmark: CART vs. ID3 vs. Linear SVM | Adult Income Census"
+        p_foot.text = "Comparative Benchmark: CART vs ID3 vs Linear SVM | Adult Income Census"
         p_foot.font.size = Pt(8.5)
         p_foot.font.color.rgb = TEXT_MUTED
         p_foot.alignment = PP_ALIGN.CENTER
@@ -131,55 +109,117 @@ def create_deck():
     # =========================================================================
     slide1 = prs.slides.add_slide(blank_layout)
     
-    # Title slide specific framing
-    add_decorations(slide1, "", "")
+    # Sleek corner accents (without disconnected thin frame lines)
+    t1 = slide1.shapes.add_shape(MSO_SHAPE.RIGHT_TRIANGLE, Inches(0), Inches(0), Inches(1.15), Inches(1.15))
+    t1.fill.solid()
+    t1.fill.fore_color.rgb = SLATE
+    t1.line.fill.background()
+    t1.rotation = 180
+
+    t2 = slide1.shapes.add_shape(MSO_SHAPE.RIGHT_TRIANGLE, Inches(0.42), Inches(0), Inches(0.8), Inches(0.8))
+    t2.fill.solid()
+    t2.fill.fore_color.rgb = MUTED_BLUE
+    t2.line.fill.background()
+    t2.rotation = 180
+
+    b1 = slide1.shapes.add_shape(MSO_SHAPE.RIGHT_TRIANGLE, Inches(12.18), Inches(6.35), Inches(1.15), Inches(1.15))
+    b1.fill.solid()
+    b1.fill.fore_color.rgb = SLATE
+    b1.line.fill.background()
+
+    b2 = slide1.shapes.add_shape(MSO_SHAPE.RIGHT_TRIANGLE, Inches(12.1), Inches(6.7), Inches(0.8), Inches(0.8))
+    b2.fill.solid()
+    b2.fill.fore_color.rgb = MUTED_BLUE
+    b2.line.fill.background()
+
+    # Footer
+    footer_box1 = slide1.shapes.add_textbox(Inches(3.8), Inches(7.15), Inches(6.0), Inches(0.3))
+    ftf1 = footer_box1.text_frame
+    p_foot1 = ftf1.paragraphs[0]
+    p_foot1.text = "Comparative Benchmark: CART vs ID3 vs Linear SVM | Adult Income Census"
+    p_foot1.font.size = Pt(8.5)
+    p_foot1.font.color.rgb = TEXT_MUTED
+    p_foot1.alignment = PP_ALIGN.CENTER
     
-    title_box = slide1.shapes.add_textbox(Inches(1.8), Inches(1.8), Inches(9.8), Inches(3.8))
+    # Center-aligned middle text block
+    title_box = slide1.shapes.add_textbox(Inches(1.416), Inches(1.3), Inches(10.5), Inches(3.2))
     tf1 = title_box.text_frame
     tf1.word_wrap = True
+    tf1.margin_left = tf1.margin_top = tf1.margin_right = tf1.margin_bottom = 0
 
+    # Top line - smaller, slate accent color
     p = tf1.paragraphs[0]
-    p.text = "COMPARATIVE PERFORMANCE ANALYSIS OF"
-    p.font.size = Pt(16)
+    p.text = "COMPARATIVE ANALYSIS OF"
+    p.font.size = Pt(14)
     p.font.bold = True
     p.font.color.rgb = SLATE
     p.alignment = PP_ALIGN.CENTER
-    p.space_after = Pt(8)
+    p.space_after = Pt(6)
 
+    # Main Title - biggest and boldest!
     p2 = tf1.add_paragraph()
     p2.text = "CART, ID3 & LINEAR SVM"
-    p2.font.size = Pt(36)
+    p2.font.size = Pt(38)
     p2.font.bold = True
     p2.font.color.rgb = NAVY
     p2.alignment = PP_ALIGN.CENTER
-    p2.space_after = Pt(10)
+    p2.space_after = Pt(14)
 
+    # Subtitle
     p3 = tf1.add_paragraph()
-    p3.text = "Empirical Research & Algorithmic Benchmarking on Demographic Income Classification"
-    p3.font.size = Pt(15)
+    p3.text = "Benchmarking Algorithms for Demographic Income Classification"
+    p3.font.size = Pt(15.5)
     p3.font.color.rgb = TEXT_DARK
     p3.alignment = PP_ALIGN.CENTER
-    p3.space_after = Pt(28)
+    p3.space_after = Pt(12)
 
+    # Tagline
     p4 = tf1.add_paragraph()
-    p4.text = "Standardized 9-Feature Subspace | Gini Impurity vs. Shannon Entropy vs. Maximum Margin Hyperplane"
+    p4.text = "Gini Impurity vs. Shannon Entropy vs. Maximum Margin Hyperplane"
     p4.font.size = Pt(12)
     p4.font.color.rgb = SLATE
     p4.alignment = PP_ALIGN.CENTER
 
-    card_meta = slide1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(3.2), Inches(5.3), Inches(7.0), Inches(1.1))
+    # Bottom Box (faint transparent grey fill, NO outline, left-aligned bulleted list)
+    card_meta = slide1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(3.366), Inches(4.75), Inches(6.6), Inches(1.85))
     card_meta.fill.solid()
-    card_meta.fill.fore_color.rgb = CARD_BG
-    card_meta.line.color.rgb = CARD_BORDER
-    card_meta.line.width = Pt(1)
+    card_meta.fill.fore_color.rgb = RGBColor(243, 246, 249) # faint transparent grey
+    card_meta.line.fill.background() # remove outline completely
 
-    meta_tx = slide1.shapes.add_textbox(Inches(3.3), Inches(5.35), Inches(6.8), Inches(1.0))
+    meta_tx = slide1.shapes.add_textbox(Inches(3.766), Inches(4.9), Inches(5.8), Inches(1.55))
     mtf = meta_tx.text_frame
     mtf.word_wrap = True
-    mp = mtf.paragraphs[0]
-    mp.text = "• Dataset: UCI Adult Census (30,162 Clean Survey Records) | Split: 80:20 Stratified\n• Target: Binary Annual Income Prediction (<=50K vs. >50K)\n• Evaluation: Accuracy, Precision, Recall, F1, ROC-AUC, Specificity & Latency"
-    mp.font.size = Pt(11)
-    mp.font.color.rgb = TEXT_DARK
+    mtf.margin_left = mtf.margin_top = mtf.margin_right = mtf.margin_bottom = 0
+
+    bottom_items = [
+        ("Dataset:", " UCI Adult Census (30,162 clean records)"),
+        ("Split:", " 80:20 Stratified"),
+        ("Target:", " Annual Income (> 50K vs <= 50K)"),
+        ("Metrics:", " Accuracy, Precision, Recall, F1, ROC-AUC, Specificity, Latency")
+    ]
+
+    for idx, (label, val) in enumerate(bottom_items):
+        p_item = mtf.paragraphs[0] if idx == 0 else mtf.add_paragraph()
+        p_item.alignment = PP_ALIGN.LEFT
+        p_item.space_after = Pt(4)
+
+        run_bullet = p_item.add_run()
+        run_bullet.text = "•  "
+        run_bullet.font.bold = True
+        run_bullet.font.size = Pt(11)
+        run_bullet.font.color.rgb = SLATE
+
+        run_label = p_item.add_run()
+        run_label.text = label
+        run_label.font.bold = True
+        run_label.font.size = Pt(11)
+        run_label.font.color.rgb = NAVY
+
+        run_val = p_item.add_run()
+        run_val.text = val
+        run_val.font.bold = False
+        run_val.font.size = Pt(11)
+        run_val.font.color.rgb = TEXT_DARK
 
     # =========================================================================
     # SLIDE 2: Project Objectives
@@ -190,8 +230,8 @@ def create_deck():
     # 4 Cards for Objectives
     objs = [
         ("1. Algorithmic Isolation", "Benchmark exactly three distinct classification paradigms—binary recursive Gini splitting (CART), multi-way nominal Shannon entropy (ID3 from scratch), and soft-margin linear hyperplanes (SVM)—on identical 80:20 stratified data splits with zero data leakage."),
-        ("2. Scratch vs. Library Analysis", "Directly contrast scikit-learn's optimized C-accelerated CART and Linear SVM against a pure scratch-built ID3 engine featuring custom continuous quantile discretization and recursive Information Gain maximization."),
-        ("3. Boundary vs. Interpretability", "Evaluate the structural trade-off between explicit, human-readable hierarchical if-then decision trees (CART & ID3) and continuous, geometric separating hyperplanes with Platt-scaled probabilistic margins (Linear SVM)."),
+        ("2. Scratch vs Library Analysis", "Directly contrast scikit-learn's optimized C-accelerated CART and Linear SVM against a pure scratch-built ID3 engine featuring custom continuous quantile discretization and recursive Information Gain maximization."),
+        ("3. Boundary vs Interpretability", "Evaluate the structural trade-off between explicit, human-readable hierarchical if-then decision trees (CART & ID3) and continuous, geometric separating hyperplanes with Platt-scaled probabilistic margins (Linear SVM)."),
         ("4. Sub-Second Interactive Inference", "Develop an interactive, multi-mode inference system (live Google Colab GUI form with `@param` controls + CLI prompt) that outputs instant multi-model predictions, confidence scores, and diagnostic matrices.")
     ]
 
@@ -649,9 +689,15 @@ def create_deck():
             p.space_after = Pt(14)
 
     # Save presentation
+    updated_pptx = "Comparative_Performance_Analysis_Presentation_Updated.pptx"
     out_pptx = "Comparative_Performance_Analysis_Presentation.pptx"
-    prs.save(out_pptx)
-    print(f"Presentation saved successfully to {out_pptx}")
+    prs.save(updated_pptx)
+    print(f"Presentation saved successfully to {updated_pptx}")
+    try:
+        prs.save(out_pptx)
+        print(f"Presentation saved successfully to {out_pptx}")
+    except PermissionError:
+        print(f"Note: {out_pptx} is currently open in PowerPoint/viewer. Updated copy saved as {updated_pptx}.")
 
 if __name__ == '__main__':
     create_deck()

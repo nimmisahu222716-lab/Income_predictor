@@ -5,3 +5,5 @@ __pycache__/
 data/adult_raw_backup.csv
 *.log
 .DS_Store
+~$*
+

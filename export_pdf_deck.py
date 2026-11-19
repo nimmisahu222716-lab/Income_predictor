@@ -60,16 +60,6 @@ def generate_pdf():
         p4.close()
         c.drawPath(p4, fill=1, stroke=0)
 
-        # Top-right frame line
-        c.setStrokeColor(SLATE)
-        c.setLineWidth(2.5)
-        c.line(PAGE_WIDTH - 240, PAGE_HEIGHT - 28, PAGE_WIDTH - 30, PAGE_HEIGHT - 28)
-        c.line(PAGE_WIDTH - 30, PAGE_HEIGHT - 28, PAGE_WIDTH - 30, PAGE_HEIGHT - 75)
-
-        # Bottom-left frame line
-        c.line(30, 25, 240, 25)
-        c.line(30, 25, 30, 75)
-
         # Title & Category
         if category:
             c.setFont("Helvetica-Bold", 8.5)
@@ -83,41 +73,54 @@ def generate_pdf():
         # Footer
         c.setFont("Helvetica", 7.5)
         c.setFillColor(TEXT_MUTED)
-        c.drawCentredString(PAGE_WIDTH / 2, 18, "Comparative Benchmark: CART vs. ID3 vs. Linear SVM | Adult Income Census")
+        c.drawCentredString(PAGE_WIDTH / 2, 18, "Comparative Benchmark: CART vs ID3 vs Linear SVM | Adult Income Census")
 
     # -------------------------------------------------------------
     # SLIDE 1: Title Slide
     # -------------------------------------------------------------
     draw_decorations(c, "", "")
-    c.setFont("Helvetica-Bold", 13)
+    c.setFont("Helvetica-Bold", 12)
     c.setFillColor(SLATE)
-    c.drawCentredString(PAGE_WIDTH / 2, 380, "COMPARATIVE PERFORMANCE ANALYSIS OF")
+    c.drawCentredString(PAGE_WIDTH / 2, 390, "COMPARATIVE ANALYSIS OF")
 
-    c.setFont("Helvetica-Bold", 30)
+    c.setFont("Helvetica-Bold", 34)
     c.setFillColor(NAVY)
-    c.drawCentredString(PAGE_WIDTH / 2, 335, "CART, ID3 & LINEAR SVM")
+    c.drawCentredString(PAGE_WIDTH / 2, 340, "CART, ID3 & LINEAR SVM")
 
-    c.setFont("Helvetica", 13)
+    c.setFont("Helvetica", 13.5)
     c.setFillColor(TEXT_DARK)
-    c.drawCentredString(PAGE_WIDTH / 2, 300, "Empirical Research & Algorithmic Benchmarking on Demographic Income Classification")
+    c.drawCentredString(PAGE_WIDTH / 2, 302, "Benchmarking Algorithms for Demographic Income Classification")
 
     c.setFont("Helvetica", 10.5)
     c.setFillColor(SLATE)
-    c.drawCentredString(PAGE_WIDTH / 2, 275, "Standardized 9-Feature Subspace | Gini Impurity vs. Shannon Entropy vs. Maximum Margin Hyperplane")
+    c.drawCentredString(PAGE_WIDTH / 2, 276, "Gini Impurity vs. Shannon Entropy vs. Maximum Margin Hyperplane")
 
-    # Metadata Card
-    c.setFillColor(CARD_BG)
-    c.setStrokeColor(CARD_BORDER)
-    c.roundRect(PAGE_WIDTH/2 - 250, 130, 500, 95, 8, fill=1, stroke=1)
+    # Metadata Card (faint transparent grey, NO outline, left-aligned bulleted list)
+    card_w = 480
+    card_h = 120
+    card_x = PAGE_WIDTH/2 - card_w/2
+    card_y = 115
 
-    c.setFont("Helvetica-Bold", 9.5)
-    c.setFillColor(NAVY)
-    c.drawString(PAGE_WIDTH/2 - 230, 202, "Research Benchmark Scope & Dataset Architecture:")
-    c.setFont("Helvetica", 8.5)
-    c.setFillColor(TEXT_DARK)
-    c.drawString(PAGE_WIDTH/2 - 230, 182, "• Dataset: UCI Adult Census (30,162 Clean Survey Records) | 80:20 Stratified Partition")
-    c.drawString(PAGE_WIDTH/2 - 230, 164, "• Target: Binary Annual Income Prediction (<=50K vs. >50K)")
-    c.drawString(PAGE_WIDTH/2 - 230, 146, "• Evaluation: Accuracy, Precision, Recall, F1, Balanced Accuracy, ROC-AUC, Latency")
+    c.setFillColor(colors.HexColor("#F1F5F9"))
+    c.roundRect(card_x, card_y, card_w, card_h, 6, fill=1, stroke=0) # NO outline!
+
+    bottom_bullets = [
+        ("Dataset:", " UCI Adult Census (30,162 clean records)"),
+        ("Split:", " 80:20 Stratified"),
+        ("Target:", " Annual Income (> 50K vs <= 50K)"),
+        ("Metrics:", " Accuracy, Precision, Recall, F1, ROC-AUC, Specificity, Latency")
+    ]
+    by = card_y + card_h - 26
+    for lbl, val in bottom_bullets:
+        c.setFont("Helvetica-Bold", 9.5)
+        c.setFillColor(SLATE)
+        c.drawString(card_x + 25, by, "•")
+        c.setFillColor(NAVY)
+        c.drawString(card_x + 40, by, lbl)
+        c.setFont("Helvetica", 9.5)
+        c.setFillColor(TEXT_DARK)
+        c.drawString(card_x + 40 + c.stringWidth(lbl, "Helvetica-Bold", 9.5), by, val)
+        by -= 24
     c.showPage()
 
     # -------------------------------------------------------------
@@ -126,8 +129,8 @@ def generate_pdf():
     draw_decorations(c, "Project Overview & Research Objectives", "FOUNDATIONAL BENCHMARK")
     objs = [
         ("1. Algorithmic Isolation", "Benchmark exactly three distinct classification paradigms—binary recursive Gini splitting (CART), multi-way nominal Shannon entropy (ID3 from scratch), and soft-margin linear hyperplanes (SVM)—on identical 80:20 stratified data splits with zero data leakage."),
-        ("2. Scratch vs. Library Analysis", "Directly contrast scikit-learn's optimized C-accelerated CART and Linear SVM against a pure scratch-built ID3 engine featuring custom continuous quantile discretization and recursive Information Gain maximization."),
-        ("3. Boundary vs. Interpretability", "Evaluate the structural trade-off between explicit, human-readable hierarchical if-then decision trees (CART & ID3) and continuous, geometric separating hyperplanes with Platt-scaled probabilistic margins (Linear SVM)."),
+        ("2. Scratch vs Library Analysis", "Directly contrast scikit-learn's optimized C-accelerated CART and Linear SVM against a pure scratch-built ID3 engine featuring custom continuous quantile discretization and recursive Information Gain maximization."),
+        ("3. Boundary vs Interpretability", "Evaluate the structural trade-off between explicit, human-readable hierarchical if-then decision trees (CART & ID3) and continuous, geometric separating hyperplanes with Platt-scaled probabilistic margins (Linear SVM)."),
         ("4. Sub-Second Interactive Inference", "Develop an interactive, multi-mode inference system (live Google Colab GUI form with @param controls + CLI prompt) that outputs instant multi-model predictions, confidence scores, and diagnostic matrices.")
     ]
     card_positions = [(80, 280), (490, 280), (80, 100), (490, 100)]
