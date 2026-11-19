@@ -146,9 +146,15 @@ The table below presents empirical metrics obtained across the test dataset (pos
 performance_analysis/
 │
 ├── Comparative_Performance_Analysis_CART_ID3_LinearSVM.ipynb  # Primary Google Colab Notebook (Run all ready)
+├── Comparative_Performance_Analysis_Presentation.pptx         # Editable PowerPoint Presentation (14 slides)
+├── Comparative_Performance_Analysis_Presentation.pdf          # Widescreen 16:9 Presentation PDF (14 slides)
+├── build_presentation.py                                      # Generator script for .pptx presentation deck
+├── export_pdf_deck.py                                         # Generator script for .pdf presentation deck
 ├── interactive_predict.py                                     # Dedicated Interactive Terminal Predictor
 ├── run_project.py                                             # Master benchmark pipeline entry point
 ├── generate_notebook.py                                       # Generator script for .ipynb
+├── generate_feature_chart.py                                  # Horizontal Feature Importance Chart Generator
+├── generate_flow_diagram.py                                   # Step-by-Step Traversal Flowchart Generator
 ├── README.md                                                  # Comprehensive documentation
 ├── requirements.txt                                           # Python package requirements
 │
@@ -160,6 +166,8 @@ performance_analysis/
 │   ├── performance_metrics_comparison.png                    # Consolidated Grouped Bar Chart
 │   ├── roc_curve_comparison.png                               # Overlaid ROC Curves (AUC comparison)
 │   ├── execution_time_comparison.png                          # Training & Prediction Latency
+│   ├── feature_importance_horizontal.png                      # Horizontal Bar Chart of Top Features + Descriptions
+│   ├── step_by_step_decision_flow.png                         # Step-by-Step Traversal Inference Diagram
 │   ├── cart_decision_tree.png                                 # CART Decision Tree Diagram (Gini Impurity)
 │   ├── id3_decision_tree.png                                  # ID3 Decision Tree Diagram (Information Gain)
 │   └── model_comparison_table.csv                             # Master Metrics Comparison CSV
