@@ -227,32 +227,61 @@ def create_deck():
     slide2 = prs.slides.add_slide(blank_layout)
     add_decorations(slide2, "Project Overview & Research Objectives", "FOUNDATIONAL BENCHMARK")
 
-    # 4 Cards for Objectives
+    # 4 Cards for Objectives with exactly 3 bullets each
     objs = [
-        ("1. Algorithmic Isolation", "Benchmark exactly three distinct classification paradigms—binary recursive Gini splitting (CART), multi-way nominal Shannon entropy (ID3 from scratch), and soft-margin linear hyperplanes (SVM)—on identical 80:20 stratified data splits with zero data leakage."),
-        ("2. Scratch vs Library Analysis", "Directly contrast scikit-learn's optimized C-accelerated CART and Linear SVM against a pure scratch-built ID3 engine featuring custom continuous quantile discretization and recursive Information Gain maximization."),
-        ("3. Boundary vs Interpretability", "Evaluate the structural trade-off between explicit, human-readable hierarchical if-then decision trees (CART & ID3) and continuous, geometric separating hyperplanes with Platt-scaled probabilistic margins (Linear SVM)."),
-        ("4. Sub-Second Interactive Inference", "Develop an interactive, multi-mode inference system (live Google Colab GUI form with `@param` controls + CLI prompt) that outputs instant multi-model predictions, confidence scores, and diagnostic matrices.")
+        ("1. Algorithmic Isolation", [
+            "Evaluated three distinct supervised classification paradigms under identical experimental constraints.",
+            "Applied an 80:20 stratified partition across 30,162 records to eliminate data leakage.",
+            "Analyzed empirical metrics on standardized 9-feature demographic input vectors."
+        ]),
+        ("2. Scratch vs Library Analysis", [
+            "Implemented a native ID3 decision tree from scratch using recursive Shannon entropy minimization.",
+            "Developed an adaptive quantile discretization module for continuous demographic attributes.",
+            "Compared scratch algorithmic fidelity against production-optimized scikit-learn classifiers."
+        ]),
+        ("3. Boundary vs Interpretability", [
+            "Analyzed structural trade-offs between hierarchical rule paths and geometric hyperplanes.",
+            "Evaluated decision transparency across axis-aligned and multi-way branching topologies.",
+            "Compared Platt-scaled margin confidence scores with terminal leaf posterior probabilities."
+        ]),
+        ("4. Sub-Second Interactive Inference", [
+            "Developed a dual-mode interactive interface supporting live Colab GUI forms and CLI prompts.",
+            "Applied automated preprocessing pipelines for instantaneous demographic profile inference.",
+            "Evaluated microsecond-level execution latencies alongside multi-model confidence outputs."
+        ])
     ]
 
-    card_w = Inches(5.2)
-    card_h = Inches(2.25)
+    card_w = Inches(5.35)
+    card_h = Inches(2.55)
     positions = [
-        (Inches(1.2), Inches(1.6)),
-        (Inches(6.8), Inches(1.6)),
-        (Inches(1.2), Inches(4.3)),
-        (Inches(6.8), Inches(4.3))
+        (Inches(1.15), Inches(1.55)),
+        (Inches(6.8), Inches(1.55)),
+        (Inches(1.15), Inches(4.35)),
+        (Inches(6.8), Inches(4.35))
     ]
 
-    for (title, text), (left, top) in zip(objs, positions):
+    for (title, bullets), (left, top) in zip(objs, positions):
         create_card(slide2, left, top, card_w, card_h, title, NAVY)
-        tx = slide2.shapes.add_textbox(left + Inches(0.2), top + Inches(0.55), card_w - Inches(0.4), card_h - Inches(0.65))
+        tx = slide2.shapes.add_textbox(left + Inches(0.2), top + Inches(0.52), card_w - Inches(0.4), card_h - Inches(0.58))
         tf = tx.text_frame
         tf.word_wrap = True
-        p = tf.paragraphs[0]
-        p.text = text
-        p.font.size = Pt(11.5)
-        p.font.color.rgb = TEXT_DARK
+        tf.margin_left = tf.margin_top = tf.margin_right = tf.margin_bottom = 0
+        
+        for b_idx, bullet in enumerate(bullets):
+            p = tf.paragraphs[0] if b_idx == 0 else tf.add_paragraph()
+            p.space_after = Pt(6)
+            
+            run_bullet = p.add_run()
+            run_bullet.text = "•  "
+            run_bullet.font.bold = True
+            run_bullet.font.size = Pt(10.5)
+            run_bullet.font.color.rgb = SLATE
+
+            run_text = p.add_run()
+            run_text.text = bullet
+            run_text.font.bold = False
+            run_text.font.size = Pt(10.5)
+            run_text.font.color.rgb = TEXT_DARK
 
     # =========================================================================
     # SLIDE 3: Model Introduction
@@ -688,16 +717,29 @@ def create_deck():
             p.font.color.rgb = TEXT_DARK
             p.space_after = Pt(14)
 
-    # Save presentation
-    updated_pptx = "Comparative_Performance_Analysis_Presentation_Updated.pptx"
+    # Save presentation cleanly handling any open file locks
     out_pptx = "Comparative_Performance_Analysis_Presentation.pptx"
-    prs.save(updated_pptx)
-    print(f"Presentation saved successfully to {updated_pptx}")
+    updated_pptx = "Comparative_Performance_Analysis_Presentation_Updated.pptx"
+    
+    saved_any = False
     try:
         prs.save(out_pptx)
         print(f"Presentation saved successfully to {out_pptx}")
+        saved_any = True
     except PermissionError:
-        print(f"Note: {out_pptx} is currently open in PowerPoint/viewer. Updated copy saved as {updated_pptx}.")
+        print(f"Note: {out_pptx} is currently open in PowerPoint/viewer.")
+
+    try:
+        prs.save(updated_pptx)
+        print(f"Presentation saved successfully to {updated_pptx}")
+        saved_any = True
+    except PermissionError:
+        print(f"Note: {updated_pptx} is currently open in PowerPoint/viewer.")
+
+    if not saved_any:
+        fallback_pptx = "Comparative_Performance_Analysis_Presentation_v2.pptx"
+        prs.save(fallback_pptx)
+        print(f"Saved to fallback file: {fallback_pptx}")
 
 if __name__ == '__main__':
     create_deck()

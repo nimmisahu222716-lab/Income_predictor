@@ -128,41 +128,64 @@ def generate_pdf():
     # -------------------------------------------------------------
     draw_decorations(c, "Project Overview & Research Objectives", "FOUNDATIONAL BENCHMARK")
     objs = [
-        ("1. Algorithmic Isolation", "Benchmark exactly three distinct classification paradigms—binary recursive Gini splitting (CART), multi-way nominal Shannon entropy (ID3 from scratch), and soft-margin linear hyperplanes (SVM)—on identical 80:20 stratified data splits with zero data leakage."),
-        ("2. Scratch vs Library Analysis", "Directly contrast scikit-learn's optimized C-accelerated CART and Linear SVM against a pure scratch-built ID3 engine featuring custom continuous quantile discretization and recursive Information Gain maximization."),
-        ("3. Boundary vs Interpretability", "Evaluate the structural trade-off between explicit, human-readable hierarchical if-then decision trees (CART & ID3) and continuous, geometric separating hyperplanes with Platt-scaled probabilistic margins (Linear SVM)."),
-        ("4. Sub-Second Interactive Inference", "Develop an interactive, multi-mode inference system (live Google Colab GUI form with @param controls + CLI prompt) that outputs instant multi-model predictions, confidence scores, and diagnostic matrices.")
+        ("1. Algorithmic Isolation", [
+            "Evaluated three distinct supervised classification paradigms under identical experimental constraints.",
+            "Applied an 80:20 stratified partition across 30,162 records to eliminate data leakage.",
+            "Analyzed empirical metrics on standardized 9-feature demographic input vectors."
+        ]),
+        ("2. Scratch vs Library Analysis", [
+            "Implemented a native ID3 decision tree from scratch using recursive Shannon entropy minimization.",
+            "Developed an adaptive quantile discretization module for continuous demographic attributes.",
+            "Compared scratch algorithmic fidelity against production-optimized scikit-learn classifiers."
+        ]),
+        ("3. Boundary vs Interpretability", [
+            "Analyzed structural trade-offs between hierarchical rule paths and geometric hyperplanes.",
+            "Evaluated decision transparency across axis-aligned and multi-way branching topologies.",
+            "Compared Platt-scaled margin confidence scores with terminal leaf posterior probabilities."
+        ]),
+        ("4. Sub-Second Interactive Inference", [
+            "Developed a dual-mode interactive interface supporting live Colab GUI forms and CLI prompts.",
+            "Applied automated preprocessing pipelines for instantaneous demographic profile inference.",
+            "Evaluated microsecond-level execution latencies alongside multi-model confidence outputs."
+        ])
     ]
-    card_positions = [(80, 280), (490, 280), (80, 100), (490, 100)]
-    for (otitle, otext), (cx, cy) in zip(objs, card_positions):
+    card_positions = [(75, 275), (490, 275), (75, 95), (490, 95)]
+    card_w2 = 395
+    card_h2 = 165
+    for (otitle, obullets), (cx, cy) in zip(objs, card_positions):
         c.setFillColor(CARD_BG)
         c.setStrokeColor(CARD_BORDER)
-        c.roundRect(cx, cy, 390, 155, 6, fill=1, stroke=1)
+        c.roundRect(cx, cy, card_w2, card_h2, 6, fill=1, stroke=1)
         # Header banner
         c.setFillColor(NAVY)
-        c.roundRect(cx, cy + 125, 390, 30, 4, fill=1, stroke=0)
+        c.roundRect(cx, cy + card_h2 - 30, card_w2, 30, 4, fill=1, stroke=0)
         c.setFont("Helvetica-Bold", 10.5)
         c.setFillColor(WHITE)
-        c.drawString(cx + 15, cy + 135, otitle)
+        c.drawString(cx + 15, cy + card_h2 - 20, otitle)
 
-        # Text
-        c.setFont("Helvetica", 9)
-        c.setFillColor(TEXT_DARK)
-        # wrap text
-        words = otext.split(' ')
-        lines = []
-        cur = ""
-        for w in words:
-            if len(cur + " " + w) > 68:
-                lines.append(cur)
-                cur = w
-            else:
-                cur = cur + " " + w if cur else w
-        if cur: lines.append(cur)
-        ty = cy + 105
-        for l in lines:
-            c.drawString(cx + 15, ty, l)
-            ty -= 14
+        # Bullets
+        ty = cy + card_h2 - 45
+        for bullet in obullets:
+            c.setFont("Helvetica-Bold", 9)
+            c.setFillColor(SLATE)
+            c.drawString(cx + 15, ty, "•")
+
+            c.setFont("Helvetica", 8.5)
+            c.setFillColor(TEXT_DARK)
+            
+            # Wrap bullet text
+            words = bullet.split(' ')
+            cur = ""
+            for w in words:
+                if len(cur + " " + w) > 65:
+                    c.drawString(cx + 28, ty, cur)
+                    ty -= 12
+                    cur = w
+                else:
+                    cur = cur + " " + w if cur else w
+            if cur:
+                c.drawString(cx + 28, ty, cur)
+                ty -= 15
     c.showPage()
 
     # -------------------------------------------------------------
